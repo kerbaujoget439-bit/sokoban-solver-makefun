@@ -274,6 +274,12 @@ function searchRoom(
           return true;
         }
       }
+      // A box is frozen only when no push of it can ever become possible:
+      // every direction is closed by a wall, by a box of another room (those
+      // never enter this room), or by the room's edge. Boxes of this room do
+      // NOT count: one standing on a push's standing square, or in its way,
+      // can move off later, so treating them as permanent wrongly prunes
+      // solvable states.
       let canMove = false;
       for (const [dx, dy] of DIRS) {
         const d = dy * w + dx;
@@ -283,10 +289,8 @@ function searchRoom(
           spec.region.has(dest) &&
           !isWall(b, dest) &&
           !blocked.has(dest) &&
-          !set.has(dest) &&
           !isWall(b, stand) &&
-          !blocked.has(stand) &&
-          !set.has(stand)
+          !blocked.has(stand)
         ) {
           canMove = true;
           break;
